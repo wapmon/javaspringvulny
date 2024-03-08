@@ -4,26 +4,25 @@ hawk:
 app:
   env: ${APP_ENV:dev}
   openApiConf:
-    path: /openapi.yml
-  env: dev
+    path: /openapi.json
   host: ${APP_HOST:https://localhost:9000}
+  excludePaths:
+    - "/logout"
+  antiCsrfParam: "_csrf"
   authentication:
     loggedInIndicator: "\\QSign Out\\E"
     loggedOutIndicator: ".*Location:.*/login.*"
     usernamePassword:
-      type: JSON
-      loginPath: /api/jwt/auth/signin
+      type: FORM
+      loginPath: /login
+      loginPagePath: /login
       usernameField: username
       passwordField: password
-      scanUsername: "user"
+      scanUsername: "janesmith"
       scanPassword: "password"
-    tokenAuthorization:
-      type: HEADER
-      value: Authorization
-      tokenType: Bearer
-    tokenExtraction:
-      type: TOKEN_PATH
-      value: "token"
+    cookieAuthorization:
+      cookieNames:
+        - "JSESSIONID"
     testPath:
-      path: /api/jwt/items/search/i
+      path: /search
       success: ".*200.*"

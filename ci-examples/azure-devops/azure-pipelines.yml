@@ -1,0 +1,41 @@
+# HawkScan Scanning in Azure Pipelines
+
+pool:
+  vmImage: ubuntu-latest
+
+trigger: none
+
+steps:
+  - checkout: self
+
+  # install the latest version of hawkscan
+  - task: HawkScanInstall@1
+    inputs:
+      version: "3.5.28"
+      installerType: "auto"
+
+  # azure pipelines default jdk is 8, so we upgrade to 17 to run JavaSpringVulny
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: "17"
+      jdkArchitectureOption: "x64"
+      jdkSourceOption: "PreInstalled"
+
+  # download, then start javaspringVulny in the background
+  - script: |
+      curl -Ls https://github.com/kaakaww/javaspringvulny/releases/download/0.2.0/java-spring-vuly-0.2.0.jar -o ./java-spring-vuly-0.2.0.jar
+      java -jar ./java-spring-vuly-0.2.0.jar &
+    displayName: Download and Start JavaSpringVulny
+
+  # run hawkscan with the StackHawk Azure Extension
+  - task: RunHawkScan@1
+    inputs:
+      configFile: "stackhawk.yml"
+      version: "3.5.28"
+    env:
+      APP_ENV: 'Azure Pipeline'
+      # use variables in the azure devops ui to configure secrets and env vars
+      # specifying HAWK_API_KEY and APP_ID here are redundant but they MUST be set in the azure devops variables
+      HAWK_API_KEY: $(HAWK_API_KEY)
+      APP_ID: $(APP_ID)
+      SARIF_ARTIFACT: true

@@ -1,10 +1,11 @@
 .gradle/
 .idea/
 build/
-db/
+db
 bin/
 .classpath
 .project
 .settings/
 .env
 .DS_Store
+*.iml

@@ -1,13 +1,16 @@
 app:
-  env: JSON Token
-  api: /openapi
+  env: ${APP_ENV:JSON Token}
+  excludePaths:
+    - "/logout"
+  openApiConf:
+    path: /openapi
   authentication:
     usernamePassword:
       type: JSON
       loginPath: /api/jwt/auth/signin
       usernameField: username
       passwordField: password
-      scanUsername: "user"
+      scanUsername: "janesmith"
       scanPassword: "password"
     tokenExtraction:
       type: TOKEN_PATH
@@ -17,11 +20,7 @@ app:
       value: Authorization
       tokenType: Bearer
     testPath:
-      path: /api/jwt/items/search/
+      path: /api/jwt/items/search/i
       success: ".*200.*"
-    loggedInIndicator: "Sign Out"
-    loggedOutIndicator: "wubba lubba dub dub"
-
-hawk:
-  spider:
-    base: false
+    loggedInIndicator: "\\QSign Out\\E"
+    loggedOutIndicator: ".*Location:.*/login.*"
